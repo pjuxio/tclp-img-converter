@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image to WebP Converter — The Chisholm Legacy Project</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-logo-wrap">
+        <img src="brand-wordmark.svg" alt="The Chisholm Legacy Project" class="header-logo header-logo-large" />
+        <img src="brand.svg" alt="The Chisholm Legacy Project" class="header-logo header-logo-small" />
+      </div>
+      <div class="header-text">
+        <h1>Image Converter</h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card upload-card">
+      <p class="card-subtitle">Upload JPEG, PNG, GIF, TIFF, BMP, AVIF, or HEIC files and download them as optimized WebP images.</p>
+
+      <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Upload images">
+        <div class="drop-zone-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <p class="drop-zone-text">Drag &amp; drop images here, or <span class="drop-zone-link">browse files</span></p>
+        <p class="drop-zone-hint">Up to 20 files &bull; 20 MB each &bull; JPEG, PNG, GIF, TIFF, BMP, AVIF, HEIC</p>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/gif,image/tiff,image/bmp,image/avif,image/heic,image/heif,image/webp" multiple hidden />
+      </div>
+
+      <div class="options-row">
+        <label class="option-label" for="qualitySlider">
+          Quality: <strong id="qualityValue">80</strong>
+        </label>
+        <input type="range" id="qualitySlider" min="1" max="100" value="80" class="quality-slider" />
+
+        <label class="option-label checkbox-label">
+          <input type="checkbox" id="losslessToggle" />
+          Lossless
+        </label>
+      </div>
+
+      <div class="resize-section">
+        <label class="option-label checkbox-label resize-toggle-label">
+          <input type="checkbox" id="resizeToggle" />
+          Resize output
+        </label>
+        <div class="resize-fields" id="resizeFields" hidden>
+          <div class="resize-inputs">
+            <div class="resize-input-group">
+              <label class="resize-dim-label" for="resizeWidth">W</label>
+              <input type="number" id="resizeWidth" class="resize-dim-input" min="1" max="10000" placeholder="px" />
+            </div>
+            <span class="resize-x" aria-hidden="true">×</span>
+            <div class="resize-input-group">
+              <label class="resize-dim-label" for="resizeHeight">H</label>
+              <input type="number" id="resizeHeight" class="resize-dim-input" min="1" max="10000" placeholder="px" />
+            </div>
+            <span class="resize-hint">Leave one blank to scale proportionally</span>
+          </div>
+          <div class="resize-opts">
+            <label class="option-label checkbox-label">
+              <input type="checkbox" id="maintainAR" checked />
+              Maintain aspect ratio
+            </label>
+            <label class="option-label checkbox-label">
+              <input type="checkbox" id="noUpscale" checked />
+              Don't upscale
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div id="fileList" class="file-list" hidden></div>
+
+      <div class="actions-row" id="actionsRow" hidden>
+        <button class="btn btn-primary" id="convertBtn">Convert to WebP</button>
+        <button class="btn btn-ghost" id="clearBtn">Clear</button>
+      </div>
+    </section>
+
+    <section class="card results-card" id="resultsCard" hidden>
+      <h2 class="card-title">Converted Files</h2>
+      <div id="resultsList" class="results-list"></div>
+      <div class="results-actions">
+        <button class="btn btn-primary" id="downloadAllBtn">Download All</button>
+        <button class="btn btn-ghost" id="convertMoreBtn">Convert More</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> The Chisholm Legacy Project</p>
+  </footer>
+
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
