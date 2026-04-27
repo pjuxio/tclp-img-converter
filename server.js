@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL;
-const APP_URL = process.env.APP_URL || `http://localhost:${PORT}`;
+const APP_URL = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 
 const ALLOWED_EMAILS = new Set(
   (process.env.ALLOWED_EMAILS || '')
