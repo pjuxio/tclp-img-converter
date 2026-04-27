@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — The Chisholm Legacy Project</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .login-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-panel);
+      border-radius: var(--radius-card);
+      padding: 2rem;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(20px);
+    }
+
+    .login-card h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      margin-bottom: 0.4rem;
+    }
+
+    .login-card p.login-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .login-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .login-field label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .login-field input[type="email"] {
+      padding: 10px 12px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-input);
+      font-size: 0.9rem;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      width: 100%;
+      transition: var(--transition);
+    }
+
+    .login-field input[type="email"]::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .login-field input[type="email"]:focus {
+      border-color: var(--accent-primary);
+      box-shadow: var(--focus-ring);
+      outline: none;
+    }
+
+    .login-submit {
+      width: 100%;
+      padding: 10px 16px;
+      background: var(--accent-primary);
+      color: #ffffff;
+      border: 2px solid var(--accent-primary);
+      border-radius: var(--radius-button);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .login-submit:hover:not(:disabled) {
+      background: var(--accent-secondary);
+      border-color: var(--accent-secondary);
+    }
+
+    .login-submit:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .login-message {
+      margin-top: 1rem;
+      padding: 10px 14px;
+      border-radius: var(--radius-input);
+      font-size: 0.875rem;
+      display: none;
+    }
+
+    .login-message.success {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      display: block;
+    }
+
+    .login-message.error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-logo-wrap">
+        <img src="brand-wordmark.svg" alt="The Chisholm Legacy Project" class="header-logo header-logo-large" />
+        <img src="brand.svg" alt="The Chisholm Legacy Project" class="header-logo header-logo-small" />
+      </div>
+      <div class="header-text">
+        <h1>Image Optimizer</h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="login-main">
+    <div class="login-card">
+      <h2>Sign in</h2>
+      <p class="login-desc">Enter your TCLP email address and we'll send you a sign-in link.</p>
+
+      <form id="loginForm" novalidate>
+        <div class="login-field">
+          <label for="emailInput">Email address</label>
+          <input type="email" id="emailInput" name="email" placeholder="you@thechisholmlegacyproject.org" autocomplete="email" required />
+        </div>
+        <button type="submit" class="login-submit" id="submitBtn">Send sign-in link</button>
+      </form>
+
+      <div class="login-message" id="loginMessage" role="alert" aria-live="assertive"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> The Chisholm Legacy Project</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('emailInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const message = document.getElementById('loginMessage');
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = 'login-message ' + type;
+    }
+
+    // Show expired-link error if redirected here from /auth/verify
+    if (new URLSearchParams(location.search).get('error') === 'expired') {
+      showMessage('Your sign-in link has expired. Enter your email to get a new one.', 'error');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      message.className = 'login-message';
+      message.textContent = '';
+
+      const email = emailInput.value.trim();
+      if (!email) {
+        showMessage('Please enter your email address.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('/auth/request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          form.reset();
+          showMessage('Check your inbox — a sign-in link is on its way.', 'success');
+        } else {
+          showMessage(data.error || 'Something went wrong. Please try again.', 'error');
+        }
+      } catch {
+        showMessage('Could not reach the server. Please try again.', 'error');
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send sign-in link';
+    });
+  </script>
+</body>
+</html>
